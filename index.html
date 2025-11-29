@@ -3,20 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>December Cooking Schedule</title>
+    <title>Cooking Schedule Multi-Month</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #d0e8ff, #f5faff);
             margin: 0;
             padding: 0;
-            animation: fadein 1s ease-in-out;
         }
-        @keyframes fadein {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         header {
             background: #0066cc;
             color: white;
@@ -25,30 +19,21 @@
             font-size: 1.5rem;
             font-weight: bold;
         }
-
         footer {
             background: #003366;
             color: white;
             text-align: center;
-            padding: 10px;
+            padding: 12px;
             margin-top: 30px;
         }
-
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: auto;
             background: white;
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            animation: slideup 0.7s ease;
         }
-
-        @keyframes slideup {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -66,93 +51,139 @@
         tr:nth-child(even) {
             background: #f1f6ff;
         }
-
         .controls {
             display: flex;
             flex-direction: column;
             gap: 10px;
             margin-bottom: 20px;
         }
-
-        .controls select, .controls button {
+        select, button {
             padding: 10px;
             font-size: 1rem;
             border-radius: 8px;
             border: 1px solid #888;
         }
-
         button {
             background: #0066cc;
             color: white;
             cursor: pointer;
-            transition: 0.3s;
         }
-
         button:hover {
             background: #004c99;
         }
-
-        @media(max-width: 600px){
-            table, th, td {
-                font-size: 0.8rem;
-            }
-            header {
-                font-size: 1.2rem;
-            }
-        }
+        @media(max-width: 600px){ th, td { font-size: 0.8rem; } }
     </style>
 </head>
 <body>
-    <header>December Cooking Schedule</header>
+<header>Multi-Month Cooking Schedule</header>
 
-    <div class="container">
-        <div class="controls">
-            <label><b>Select First Person of the Month:</b></label>
-            <select id="firstPerson">
-                <option>Hasan</option>
-                <option>Nahid</option>
-                <option>Ujjal</option>
-                <option>Arif</option>
-                <option>Rabbi</option>
-            </select>
-            <button onclick="generateSchedule()">Apply</button>
+<div class="container">
+    <div class="controls">
 
-            <p><b>Next Person To Cook Today:</b> <span id="nextPerson" style="color:#0066cc;font-weight:bold;"></span></p>
-        </div>
+        <label><b>Select Month:</b></label>
+        <select id="monthSelect"></select>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Person Responsible</th>
-                </tr>
-            </thead>
-            <tbody id="scheduleTable"></tbody>
-        </table>
+        <label><b>Select Year:</b></label>
+        <select id="yearSelect"></select>
+
+        <label><b>Select First Person of Month:</b></label>
+        <select id="firstPerson">
+            <option>Hasan</option>
+            <option>Nahid</option>
+            <option>Ujjal</option>
+            <option>Arif</option>
+            <option>Rabbi</option>
+        </select>
+
+        <button onclick="generateSchedule()">Generate</button>
+
+        <p><b>Next Person Today:</b> <span id="nextPerson" style="color:#0066cc;font-weight:bold;"></span></p>
+        <button onclick="saveSettings()">Save Settings</button>
+        <button onclick="loadSettings()">Load Saved Settings</button>
     </div>
 
-    <footer>Cooking Rotation System © 2025</footer>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Person Responsible</th>
+            </tr>
+        </thead>
+        <tbody id="scheduleTable"></tbody>
+    </table>
+</div>
 
-    <script>
-        const allPeople = ["Hasan", "Nahid", "Ujjal", "Arif", "Rabbi"];
+<footer>Cooking Rotation System © 2025</footer>
 
-        function generateSchedule(){
-            const first = document.getElementById("firstPerson").value;
-            let startIndex = allPeople.indexOf(first);
+<script>
+    const allPeople = ["Hasan", "Nahid", "Ujjal", "Arif", "Rabbi"];
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-            const tbody = document.getElementById("scheduleTable");
-            tbody.innerHTML = "";
+    function populateDropdowns(){
+        const monthSel = document.getElementById("monthSelect");
+        const yearSel = document.getElementById("yearSelect");
 
-            for (let day = 1; day <= 31; day++){
-                const person = allPeople[(startIndex + (day - 1)) % allPeople.length];
-                const row = `<tr><td>December ${day}</td><td>${person}</td></tr>`;
-                tbody.insertAdjacentHTML("beforeend", row);
-            }
-
-            document.getElementById("nextPerson").innerText = allPeople[startIndex];
+        for(let m = 0; m < 12; m++){
+            const opt = document.createElement("option");
+            opt.textContent = monthNames[m];
+            opt.value = m;
+            monthSel.appendChild(opt);
         }
 
-        window.onload = generateSchedule;
-    </script>
+        const currentYear = new Date().getFullYear();
+        for(let y = currentYear - 2; y <= currentYear + 3; y++){
+            const opt = document.createElement("option");
+            opt.textContent = y;
+            opt.value = y;
+            yearSel.appendChild(opt);
+        }
+    }
+
+    function daysInMonth(month, year){ return new Date(year, month+1, 0).getDate(); }
+
+    function generateSchedule(){
+        const month = parseInt(document.getElementById("monthSelect").value);
+        const year = parseInt(document.getElementById("yearSelect").value);
+        const first = document.getElementById("firstPerson").value;
+        const startIndex = allPeople.indexOf(first);
+
+        const tbody = document.getElementById("scheduleTable");
+        tbody.innerHTML = "";
+
+        const numDays = daysInMonth(month, year);
+
+        for (let d = 1; d <= numDays; d++){
+            const person = allPeople[(startIndex + (d - 1)) % allPeople.length];
+            tbody.insertAdjacentHTML("beforeend", `<tr><td>${monthNames[month]} ${d}, ${year}</td><td>${person}</td></tr>`);
+        }
+
+        document.getElementById("nextPerson").textContent = allPeople[startIndex];
+    }
+
+    function saveSettings(){
+        const settings = {
+            month: document.getElementById("monthSelect").value,
+            year: document.getElementById("yearSelect").value,
+            first: document.getElementById("firstPerson").value
+        };
+        localStorage.setItem("cookingSettings", JSON.stringify(settings));
+        alert("Saved Successfully!");
+    }
+
+    function loadSettings(){
+        const saved = localStorage.getItem("cookingSettings");
+        if(!saved){ alert("No data saved!"); return; }
+
+        const s = JSON.parse(saved);
+        document.getElementById("monthSelect").value = s.month;
+        document.getElementById("yearSelect").value = s.year;
+        document.getElementById("firstPerson").value = s.first;
+
+        generateSchedule();
+    }
+
+    window.onload = () => { populateDropdowns(); generateSchedule(); };
+</script>
+
 </body>
 </html>
