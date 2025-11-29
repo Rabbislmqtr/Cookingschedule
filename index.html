@@ -183,48 +183,6 @@
     }
 
     window.onload = () => { populateDropdowns(); generateSchedule(); };
-
-    /* --- GOOGLE SHEETS GLOBAL FIRST-PERSON SYSTEM --- */
-
-    const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxewpccOhba5TZVXrx3MMxvxpSLQ0gSJNw5-qUa-zsjnbxXECAK5ogu5uCOxwkqQiDywQ/exec";
-
-    async function loadGlobalFirstPerson(){
-        try{
-            const res = await fetch(SHEET_SCRIPT_URL + "?mode=get");
-            const data = await res.json();
-            if(data.first){
-                document.getElementById("firstPerson").value = data.first;
-            }
-        }catch(e){ console.log("Error loading global value", e); }
-    }
-
-    async function saveGlobalFirstPerson(person){
-        try{
-            await fetch(SHEET_SCRIPT_URL + "?mode=set&value=" + person);
-            alert("Global First Person Updated for Everyone!");
-        }catch(e){ alert("Error saving global setting"); }
-    }
-
-    /* Hidden triple‑tap trigger */
-    let tapCount = 0;
-    document.body.addEventListener("click", () => {
-        tapCount++;
-        if(tapCount === 3){
-            const newP = prompt("Enter new first person of the month:
-Hasan / Nahid / Ujjal / Arif / Rabbi");
-            if(allPeople.includes(newP)){
-                saveGlobalFirstPerson(newP);
-                document.getElementById("firstPerson").value = newP;
-                generateSchedule();
-            } else {
-                alert("Invalid name.");
-            }
-            tapCount = 0;
-        }
-        setTimeout(()=> tapCount = 0, 1000);
-    });
-
-    window.onload = () => { populateDropdowns(); loadGlobalFirstPerson(); generateSchedule(); };
 </script>
 
 </body>
