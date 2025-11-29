@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>December Cooking Schedule</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #d0e8ff, #f5faff);
+            margin: 0;
+            padding: 0;
+            animation: fadein 1s ease-in-out;
+        }
+        @keyframes fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        header {
+            background: #0066cc;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        footer {
+            background: #003366;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: slideup 0.7s ease;
+        }
+
+        @keyframes slideup {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #004d99;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f1f6ff;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .controls select, .controls button {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid #888;
+        }
+
+        button {
+            background: #0066cc;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #004c99;
+        }
+
+        @media(max-width: 600px){
+            table, th, td {
+                font-size: 0.8rem;
+            }
+            header {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>December Cooking Schedule</header>
+
+    <div class="container">
+        <div class="controls">
+            <label><b>Select First Person of the Month:</b></label>
+            <select id="firstPerson">
+                <option>Hasan</option>
+                <option>Nahid</option>
+                <option>Ujjal</option>
+                <option>Arif</option>
+                <option>Rabbi</option>
+            </select>
+            <button onclick="generateSchedule()">Apply</button>
+
+            <p><b>Next Person To Cook Today:</b> <span id="nextPerson" style="color:#0066cc;font-weight:bold;"></span></p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Person Responsible</th>
+                </tr>
+            </thead>
+            <tbody id="scheduleTable"></tbody>
+        </table>
+    </div>
+
+    <footer>Cooking Rotation System © 2025</footer>
+
+    <script>
+        const allPeople = ["Hasan", "Nahid", "Ujjal", "Arif", "Rabbi"];
+
+        function generateSchedule(){
+            const first = document.getElementById("firstPerson").value;
+            let startIndex = allPeople.indexOf(first);
+
+            const tbody = document.getElementById("scheduleTable");
+            tbody.innerHTML = "";
+
+            for (let day = 1; day <= 31; day++){
+                const person = allPeople[(startIndex + (day - 1)) % allPeople.length];
+                const row = `<tr><td>December ${day}</td><td>${person}</td></tr>`;
+                tbody.insertAdjacentHTML("beforeend", row);
+            }
+
+            document.getElementById("nextPerson").innerText = allPeople[startIndex];
+        }
+
+        window.onload = generateSchedule;
+    </script>
+</body>
+</html>
